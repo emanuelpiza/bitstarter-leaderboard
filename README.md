@@ -68,76 +68,114 @@ following conceptual topics:
     ([1](https://github.com/startup-class/bitstarter-leaderboard/blob/master/views/homepage.ejs#L70),
     [2](https://github.com/startup-class/bitstarter-leaderboard/blob/master/public/js/controllers.js#L17))
 
-Let's install the app and then take a tour of the functionality.
 
-# Installation
-To get the app up and running, execute the following commands on your EC2
-instance:
+#Preparação do Servidor
+
+1. Criar uma conta na [Amazon](https://aws.amazon.com/). 
+
+2. Entrar no [EC2 Console](https://console.aws.amazon.com/ec2/v2/home?region=us-west-2) e mudar sua região para São Paulo, no canto superior direito da tela.
+
+3. Criar uma nova instância EC2; Escolher Ubuntu Server 12.04.3 LTS (Free tier eligible de 64 bits). Não são necessárias alterações dos passos 2 a 5. 
+
+4. No passo 6, criar um novo Security Group (Adicionando as regras: SSH[Porta padrão], HTTP[Porta padrão], HTTPS[Porta padrão] e Custom TCP Rule [Porta 8080])
+
+5. Lançar a instância e criar/baixar a key pair quando questionado.
+
+7. No seu computador, pelo terminal(Mac ou Linux) ou Cygwin(Windows) vá ao diretório onde a .pem está e altere suas permissões:
 
 ```sh
-curl https://raw.github.com/startup-class/setup/master/setup.sh | bash
-exit # and then log in again
-git clone https://github.com/startup-class/bitstarter-leaderboard.git
-cd bitstarter-leaderboard
+    chmod 400 ./beagle.pem
+```
+
+8A. Para se conectar, acesse:
+
+```sh
+    ssh -i seuArquivo.pem ubuntu@seuIp
+```
+
+8B. Uma alternativa ao comando acima é adicionar o host a um arquivo de conexão dentro da pasta oculta .ssh do seu usuário:
+
+```sh
+#Abra o arquivo de configuração do ssh usando o seu editor de texto favorito.
+    emacs ~/.ssh/config
+
+#E edite-o para que fique no seguinte formato:
+    Host va
+    HostName ec2-SeuNúmero.us-west-2.compute.amazonaws.com
+    User ubuntu
+    IdentityFile "seuArquivo.pem"
+    
+#Após isso, o comando abaixo é suficiente para a conexão:
+    ssh va
+```
+
+Para detalhes dos passos acima, [clique aqui](https://www.dropbox.com/s/i25oslsqwxd5ocw/lecture2-interactive-start.pdf?m)
+
+# Instalação
+
+Para configurar a instância e o ambiente de desenvolvimento, rodar os seguintes comandos no EC2:
+
+```sh
+#Instalar o git
+sudo apt-get install -y git-core
+
+#Clonar o repositório de setup de variáveis da instância
+git clone https://github.com/emanuelpiza/setup
+
+#Executar
+./setup/setup.sh
+
+#Sair (digitando exit) e entrar novamente no sistema. Em seguida, executar os seguintes comandos, referentes ao ambiente de desenvolvimento:
+cd $HOME 
+git clone https://github.com/startup-class/dotfiles.git
+ln -sb dotfiles/.screenrc . 
+ln -sb dotfiles/.bash_profile . 
+ln -sb dotfiles/.bashrc . 
+ln -sb dotfiles/.bashrc_custom . 
+mv .emacs.d .emacs.d~ 
+ln -s dotfiles/.emacs.d .
+```
+
+Para clonar e executar a versão atual da app, entrar com:
+
+```sh
+git clone https://github.com/emanuelpiza/va.git
+cd va
+#É necessário alterar o arquivo .env.dummy para .env. Ele tem algumas variáveis usadas pelo código
+mv .env.dummy .env
+emacs .env #Alterar código de API para 48a6c998e3835a1cfe7fe319564411563c61b0f4d3a6b9822e2632f3aef8d891
+#Ctrl X Ctrl C pra fechar o emacs (Lembrar de salvar)
 ./setup-ssjs.sh
 ```
 
-## Running Locally on an EC2 Instance
-Once you have done this you will need to :
- 
-1. Copy the [.env.dummy](.env.dummy) file into `.env` and include your API
-key from http://coinbase.com/account/integrations so that it looks like the
-snippet below. Note that `COINBASE_API_KEY` is a secure API key that should
-never be checked into a git repository; that's why we exclude it in the
-[.gitignore](.gitignore).
+Durante a execução do script. Será necessário logar com a conta Heroku. Caso não a tenha, entrar em www.heroku.com e criar. Para os parâmetros seguintes de ssh, não é necessário entrar com nenhuma informação.
 
-```bash
-$ cp .env.dummy .env
-$ emacs -nw .env  # Add key from coinbase.com/account/integrations
-$ cat .env
-COINBASE_API_KEY=cb27e2ef0a8872f7923612d4d57937e70476ab8041455b00b35d1196cf80f50d
-PORT=8080
-```
+Será necessário entrar com o password bitpass0 quando pedido, por motivos de compatibilidade. (A ser removido)
 
-2. Edit the [constants.js](.constants.js) file to include the
-preorder button from http://coinbase.com/merchant_tools. This is a non-secure
-code that is meant to be embedded in a public-facing webpage, so it's ok if
-you check this into git.
-
-```js
-  COINBASE_PREORDER_DATA_CODE: "13b56883764b54e6ab56fef3bcc7229c",
-```
-
-3. Now you can run the server locally and preview at a URL like
-http://ec2-54-213-131-228.us-west-2.compute.amazonaws.com:8080 as follows:
+Rodando o comando abaixo na pasta do projeto, você poderá ver o site através do URL disponibilizado pela Amazon, porta 8080.
+http://ec2-54-213-131-228.us-west-2.compute.amazonaws.com:8080
 
 ```sh
 foreman start
 ```
 
-You can determine the hostname of your EC2 instance conveniently with this
-command:
+O comando abaixo te indica o seu URL:
 
 ```sh
 curl -s http://169.254.169.254/latest/meta-data/public-hostname
 # ec2-54-213-192-71.us-west-2.compute.amazonaws.com
 ```
 
-Try placing some orders and then going to the "/orders" URL at the top to
-see them recorded. Also refresh the page to see the thermometer update. Note
-that you will get an error if you didn't do the `.env` step above.
+## Rodando no Heroku
+Com o projeto funcionando pelo `foreman start` na sua EC2, você pode alterá-lo e testá-lo. Esse é o seu ambiente de desenvolvimento. Um espelho do estado atual do branch master.
 
-## Running Remotely
-Once the app works via `foreman start` on your EC2 machine, you can deploy to Heroku and push
-the configuration variables defined in `.env` as follows:
+Antes de qualquer commit, é importante enviá-lo ao Heroku para teste em um ambiente de staging, para garantir que todas as alterações enviadas serão suficientes. Os comandos abaixo sobem as alterações pro app no Heroku.
+:
 
 ```sh
 git push heroku master
 heroku config:push
 ```
-Then you can go to a URL like http://safe-dawn-4440.herokuapp.com and submit
-orders to test it out. Note again that you will get an "invalid api key"
-error if you didn't do the `.env` step above.
 
 # Concepts
 
