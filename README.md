@@ -84,13 +84,13 @@ following conceptual topics:
 7. No seu computador, pelo terminal(Mac ou Linux) ou Cygwin(Windows) vá ao diretório onde a .pem está e altere suas permissões:
 
 ```sh
-    chmod 400 ./beagle.pem
+    chmod 400 ./seuArquivo.pem
 ```
 
 8A. Para se conectar, acesse:
 
 ```sh
-    ssh -i seuArquivo.pem ubuntu@seuIp
+    ssh -i seuArquivo.pem ubuntu@seuIp_ec2 #seu ip pode ser observado se clicando na instância criada, no site da amazon
 ```
 
 8B. Uma alternativa ao comando acima é adicionar o host a um arquivo de conexão dentro da pasta oculta .ssh do seu usuário:
@@ -148,12 +148,11 @@ emacs .env #Alterar código de API para 48a6c998e3835a1cfe7fe319564411563c61b0f4
 ./setup-ssjs.sh
 ```
 
-Durante a execução do script. Será necessário logar com a conta Heroku. Caso não a tenha, entrar em www.heroku.com e criar. Para os parâmetros seguintes de ssh, não é necessário entrar com nenhuma informação.
+Durante a execução do script. Será necessário logar com a conta Heroku para criar o ambiente de staging. Caso não a tenha, entrar em www.heroku.com e criar. Para os parâmetros seguintes de ssh, não é necessário entrar com nenhuma informação.
 
 Será necessário entrar com o password bitpass0 quando pedido, por motivos de compatibilidade. (A ser removido)
 
-Rodando o comando abaixo na pasta do projeto, você poderá ver o site através do URL disponibilizado pela Amazon, porta 8080.
-http://ec2-54-213-131-228.us-west-2.compute.amazonaws.com:8080
+Rodando o comando abaixo na pasta do projeto, você poderá ver o site através do URL disponibilizado pela Amazon, porta 8080. Por exemplo: http://ec2-54-213-131-228.us-west-2.compute.amazonaws.com:8080
 
 ```sh
 foreman start
