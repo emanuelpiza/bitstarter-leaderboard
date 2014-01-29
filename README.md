@@ -141,10 +141,13 @@ Para clonar e executar a versão atual da app, entrar com:
 ```sh
 git clone https://github.com/emanuelpiza/va.git
 cd va
-#É necessário alterar o arquivo .env.dummy para .env. Ele tem algumas variáveis usadas pelo código
-mv .env.dummy .env
-emacs .env #Alterar código de API para 48a6c998e3835a1cfe7fe319564411563c61b0f4d3a6b9822e2632f3aef8d891
-#Ctrl X Ctrl C pra fechar o emacs (Lembrar de salvar)
+
+#Criar um branch com seu nome, utilizando os seguintes comandos:
+
+git branch dev_+seu-nome
+
+Construa o site do seu projeto nesse branch. Um comentário útil é que este branch só aparecerá no comando git branch após o seu primeiro commit.
+
 ./setup-ssjs.sh
 ```
 
@@ -168,12 +171,15 @@ curl -s http://169.254.169.254/latest/meta-data/public-hostname
 ## Rodando no Heroku
 Com o projeto funcionando pelo `foreman start` na sua EC2, você pode alterá-lo e testá-lo. Esse é o seu ambiente de desenvolvimento. Um espelho do estado atual do branch master.
 
-Antes de qualquer commit, é importante enviá-lo ao Heroku para teste em um ambiente de staging, para garantir que todas as alterações enviadas serão suficientes. Os comandos abaixo sobem as alterações pro app no Heroku.
-:
+Antes de qualquer commit, é importante enviá-lo ao Heroku para teste em um ambiente de staging, para garantir que todas as alterações enviadas serão suficientes. Os comandos abaixo sobem as alterações pro app no Heroku. 
+
 
 ```sh
-git push heroku master
+git push heroku dev_+seu-nome
 heroku config:push
+
+#E, finalmente, depois de testado, dê um push desse novo branch para o repositório do projeto: (Ainda precisa ser aprimorado. Como fazer commit para o master?)
+git push origin heroku
 ```
 
 # Concepts
