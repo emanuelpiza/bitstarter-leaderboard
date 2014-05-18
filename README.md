@@ -161,6 +161,12 @@ Rodando o comando abaixo na pasta do projeto, você poderá ver o site através 
 foreman start
 ```
 
+Para direcionar para a porta 80 (padrão) entrar com o código abaixo:
+
+```sh
+sudo iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+```
+
 O comando abaixo te indica o seu URL:
 
 ```sh
